@@ -1,10 +1,56 @@
 #include <stdio.h>
-#include <string.h>
+#include <iostream>
+#include <string>
 #include <stdlib.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <memory>
+#include <sys/mman.h>
+using namespace std;
+
+
+
+//缓存数据对象
+class InfoNode{
+    int id; //数据ID
+    int size;   //数据大小
+    
+    int index;  //缓存区块起始序号
+    int num;    //缓冲区块使用数
+
+    InfoNode *pre;
+    InfoNode *next;
+
+    InfoNode(int id,int size,int index,int num){
+        this->id = id;
+        this->size = size;
+        this->index = index;
+        this->num = num;
+        pre = NULL;
+        next = NULL;
+    }
+};
+
+
+
+
+
+
+
+
+void malloc_1024(){
+    void *p;
+    //分配1G内存 1G = 1024M = 1024*1024*1024
+    p = malloc(1024*1024*1024);
+    //从p地址开始的1G内都锁定不被换出
+    mlock(p,1024*1024*1024);
+
+
+}
+
+
 
 int main(){
     //创建套接字
@@ -29,7 +75,41 @@ int main(){
 
     //向客户端发送数据
     char str[] = "Hello World!";
-    write(clnt_sock,str,sizeof(str));
+    char buffer[40];
+    read(clnt_sock,buffer,sizeof(buffer)-1);
+
+    string buf(buffer);
+
+    //cout<<buf[0]<<endl;
+    if(buf[0]=='W'){
+        //通过反向寻找第一个“，”，先截取出数据段
+        int data_index = buf.rfind(',');
+        string data = buf.substr(data_index+1);
+        cout<<data<<endl;
+
+        //再从buf删去已经截取了数据段的字符串，再通过同样的方法截取出数据id
+        buf = buf.substr(0,data_index);
+        int id_index = buf.rfind(',');
+        string id_str = buf.substr(id_index+1);
+        int id = std::stoi(id_str);
+        //cout<<id<<endl;
+
+        
+    }
+
+
+    //write(clnt_sock,str,sizeof(str));
+    
+    // printf("Message from client: %s\n",buffer);
+
+    // while(1){
+    //     read(clnt_sock,buffer,sizeof(buffer)-1);
+    //     printf("Message from client: %s\n",buffer);
+    //     string flag(buffer);
+    //     if(flag=="exit"){
+    //         break;
+    //     }
+    // }
 
     //关闭套接字
     close(clnt_sock);

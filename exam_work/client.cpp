@@ -1,9 +1,12 @@
 #include <stdio.h>
+#include <iostream>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+using namespace std;
+
 
 int main(){
     //创建套接字
@@ -19,11 +22,33 @@ int main(){
 
     connect(sock,(struct sockaddr*)&serv_addr,sizeof(serv_addr));
 
-    //读取服务器传回的数据
-    char buffer[40];
-    read(sock,buffer,sizeof(buffer)-1);
 
-    printf("Message from server: %s\n",buffer);
+    int flag = 1;
+
+    // while(flag){
+    //     //输入0则退出
+    //     cin>>flag;
+    //     if(flag==0){
+    //         cout<<"退出程序"<<endl;
+    //         break;
+    //     }
+
+    //     char *msg;
+    //     cin>>msg;
+    //     write(sock,msg,sizeof(msg));
+        
+    // }
+
+
+    // //char* msgs = "W:4,10,abcdejsdasd";
+    char str[] = "W,4,abcdsdjjklfsa";
+    write(sock,str,sizeof(str));
+
+    // //读取服务器传回的数据
+    // char buffer[40];
+    // //read(sock,buffer,sizeof(buffer)-1);
+    // write(sock,str,sizeof(str));
+    // //printf("Message from server: %s\n",buffer);
 
     //关闭套接字
     close(sock);
