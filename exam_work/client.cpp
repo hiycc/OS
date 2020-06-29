@@ -6,11 +6,11 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 using namespace std;
+#define BUF_SIZE 256
 
 
 int main(){
-    //创建套接字
-    int sock = socket(AF_INET,SOCK_STREAM,0);   //SOCK_STREAM表示使用面向连接的数据传输方式
+    
     
 
     //向服务器(特定的IP和端口)发送请求
@@ -20,7 +20,26 @@ int main(){
     serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); //具体的IP地址
     serv_addr.sin_port = htons(1234);   //端口
 
-    connect(sock,(struct sockaddr*)&serv_addr,sizeof(serv_addr));
+    char bufSend[BUF_SIZE];
+    char bufRev[BUF_SIZE];
+
+    while(1){
+        //创建套接字
+        int sock = socket(AF_INET,SOCK_STREAM,0);   //SOCK_STREAM表示使用面向连接的数据传输方式
+        connect(sock,(struct sockaddr*)&serv_addr,sizeof(serv_addr));
+
+        cin>>bufSend;
+        write(sock,bufSend,strlen(bufSend));
+        read(sock,bufRev,BUF_SIZE);
+        cout<<bufRev<<endl;
+
+        memset(bufSend,0,BUF_SIZE);
+        memset(bufRev,0,BUF_SIZE);
+
+        close(sock);
+    }
+
+    //connect(sock,(struct sockaddr*)&serv_addr,sizeof(serv_addr));
 
 
     int flag = 1;
@@ -41,8 +60,8 @@ int main(){
 
 
     // //char* msgs = "W:4,10,abcdejsdasd";
-    char str[] = "W,4,abcdsdjjklfsa";
-    write(sock,str,sizeof(str));
+    // char str[] = "W:4,13,abcdsdjjklfsa";
+    // write(sock,str,sizeof(str));
 
     // //读取服务器传回的数据
     // char buffer[40];
@@ -51,7 +70,7 @@ int main(){
     // //printf("Message from server: %s\n",buffer);
 
     //关闭套接字
-    close(sock);
-    return 0;
+    // close(sock);
+    // return 0;
 
 }
